@@ -8,13 +8,6 @@
 #include "codec_tests.h"
 #include "../codec_local.h"
 
-#include <stdio.h>
-void print_uint8_str(uint8_t *p, uint16_t size, char *msg) {
-  printf("\n%s %d bytes: \n", msg, size);
-  for (int i = 0; i < size; ++i) printf("%0.2x", *p++);
-  printf("\n");
-}
-
 #define MAX_PACKET_SIZE 0x7fffu
 #define MAX_ENCRYPTED_SIZE MAX_PACKET_SIZE - TAG_SIZE - sizeof(uint16_t)
 

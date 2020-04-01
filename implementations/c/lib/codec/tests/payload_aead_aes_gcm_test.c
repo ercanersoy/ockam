@@ -9,10 +9,12 @@
 #include "../codec_local.h"
 
 #define MAX_PACKET_SIZE 0x7fffu
-#define MAX_ENCRYPTED_SIZE MAX_PACKET_SIZE - TAG_SIZE - sizeof(uint16_t)
+#define MAX_ENCRYPTED_SIZE MAX_PACKET_SIZE - AEAD_AES_GCM_TAG_SIZE - sizeof(uint16_t)
 
-PayloadAeadAesGcm *test_payload = NULL;
-PayloadAeadAesGcm *end_payload = NULL;
+extern void print_uint8_str(uint8_t *p, uint16_t size, char *msg);
+
+uint8_t *test_payload = NULL;
+uint8_t *end_payload = NULL;
 uint8_t *encoded_payload = NULL;
 
 int _test_codec_payload_aead_aes_gcm_setup(void **state) {
@@ -36,8 +38,8 @@ int _test_codec_payload_aead_aes_gcm_setup(void **state) {
     goto exit_block;
   }
 
-  for (int i = 0; i < MAX_ENCRYPTED_SIZE; ++i) {
-    test_payload->encrypted_data[i] = i;
+  for (int i = 0; i < MAX_PACKET_SIZE; ++i) {
+    test_payload[i] = (uint8_t)i;
   }
 
 exit_block:
@@ -45,20 +47,26 @@ exit_block:
 }
 
 void _test_codec_payload_aead_aes_gcm(void **state) {
-  uint8_t *out = NULL;
-  uint8_t *_out = NULL;
-  uint8_t *in = NULL;
+  uint8_t *out = 0;
+  uint8_t *in = 0;
+  uint16_t tag_offset = 0;
+  uint16_t encrypted_length_in = 0;
+  uint16_t encrypted_length_out = 0;
 
-  for (uint16_t i = TAG_SIZE + sizeof(uint16_t); i < MAX_ENCRYPTED_SIZE; ++i) {
+  for (uint16_t i = 0; i < MAX_ENCRYPTED_SIZE; ++i) {
     memset(end_payload, 0, MAX_PACKET_SIZE);
-    test_payload->length = i;
 
-    out = encode_payload_aead_aes_gcm(encoded_payload, test_payload);
+    tag_offset = i;
+    out = encode_payload_aead_aes_gcm(encoded_payload, MAX_PACKET_SIZE, test_payload+tag_offset, AEAD_AES_GCM_TAG_SIZE,
+                                      test_payload, i);
     if (i & 0x8000u) {
       assert_null(out);
     } else {
-      in = decode_payload_aead_aes_gcm(encoded_payload, end_payload);
-      assert_int_equal(0, memcmp(test_payload, end_payload, i));
+      encrypted_length_out = i;
+      in = decode_payload_aead_aes_gcm(encoded_payload, end_payload+tag_offset, AEAD_AES_GCM_TAG_SIZE,
+          end_payload, &encrypted_length_out);
+      assert_int_equal(i, encrypted_length_out);
+      assert_int_equal(0, memcmp(test_payload, end_payload, i + AEAD_AES_GCM_TAG_SIZE));
     }
   }
 }

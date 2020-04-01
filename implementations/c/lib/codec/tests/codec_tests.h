@@ -9,4 +9,8 @@ int _test_codec_payload_aead_aes_gcm_setup(void **state);
 void _test_codec_payload_aead_aes_gcm(void **state);
 int _test_codec_payload_aead_aes_gcm_teardown(void **state);
 
+int _test_codec_payload_setup(void **state);
+void _test_codec_payload(void **state);
+int _test_codec_payload_teardown(void **state);
+
 void _test_public_key(void **state);

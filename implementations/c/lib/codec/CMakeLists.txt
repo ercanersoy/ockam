@@ -10,6 +10,7 @@ ockam_cc_library(
 		"variable_length_encoded_u2le.c"
 		"payload_aead_aes_gcm.c"
 		"public_key.c"
+		"payload.c"
 	HDRS
   PUBLIC )
 

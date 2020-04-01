@@ -54,3 +54,16 @@ uint8_t* encode_variable_length_encoded_u2le(uint8_t* encoded, uint16_t val) {
 exit_block:
   return encoded;
 }
+
+// int main() {
+//   uint8_t b[8];
+//   uint16_t j;
+//   for (int i = 0x7ffb; i < 0x8000; ++i) {
+//     encode_variable_length_encoded_u2le(b, i);
+//     printf("i: 0x$%.4x\n", i);
+//     printf("encoded: 0x%.2x 0x%.2x\n", b[0], b[0]);
+//     decode_variable_length_encoded_u2le(b, &j);
+//     printf("decoded: 0x%.4x\n", j);
+//   }
+//   return 0;
+// }

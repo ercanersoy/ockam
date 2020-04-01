@@ -25,3 +25,5 @@ uint8_t *decode_payload_aead_aes_gcm(uint8_t *encoded, uint8_t *tag, uint16_t ta
                                      uint8_t *encrypted_data, uint16_t *encrypted_length);
 uint8_t *encode_public_key(uint8_t *encoded, CodecKeyCurve type, uint8_t *x, uint8_t* y);
 uint8_t *decode_public_key(uint8_t *encoded, CodecKeyCurve *type,  uint8_t *x, uint8_t* y);
+uint8_t *encode_payload(uint8_t *encoded, uint16_t length, uint8_t *data, uint16_t data_length);
+uint8_t *decode_payload(uint8_t *encoded, uint8_t *data, uint16_t *data_length);

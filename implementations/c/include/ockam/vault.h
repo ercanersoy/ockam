@@ -87,37 +87,6 @@ typedef enum {
 
 /*
  ********************************************************************************************************
- *                                               DATA TYPES                                             *
- ********************************************************************************************************
- */
-
-/**
- *******************************************************************************
- * @struct  OckamVaultCtx
- *
- * @brief   This struct is common for all Vault implementations. It contains all
- *          information about a single instance of Vault. Multiple instances of
- *          vault can be created by allocating multiple Vault context
- *          structures. The memory, features and ec parameters should always be
- *          set in this struct. The context pointers may or may not be used, it
- *          depends on the specific Vault implementation.
- *******************************************************************************
- */
-
-typedef struct {
-  const OckamMemory *memory; /*!< Pointer to the Ockam Memory interface            */
-  uint32_t features;         /*!< Bitfield containing all enabled vault functions  */
-  uint32_t default_features; /*!< Bitfield containing all enabled default functions*/
-  OckamVaultEc ec;           /*!< The elliptic curve supported by this vault       */
-  void *random_ctx;          /*!< Pointer to random function data                  */
-  void *key_ecdh_ctx;        /*!< Pointer to the Key/ECDH function data            */
-  void *sha256_ctx;          /*!< Pointer to the SHA256 function data              */
-  void *hkdf_ctx;            /*!< Pointer to the HKDF function data                */
-  void *aes_gcm_ctx;         /*!< Pointer to the AES-GCM function data             */
-} OckamVaultCtx;
-
-/*
- ********************************************************************************************************
  *                                               INTERFACE                                              *
  ********************************************************************************************************
  */
@@ -412,6 +381,59 @@ typedef struct {
                               size_t aad_size, uint8_t *p_tag, size_t tag_size, uint8_t *p_input, size_t input_size,
                               uint8_t *p_output, size_t output_size);
 } OckamVault;
+
+
+/**
+ ****************************************************************************************************
+ *                                        OckamVaultRandom()
+ *
+ * @brief   Generate a random number of desired size.
+ *
+ * @param   ctx[in]       Pointer to an initialized Vault context structure.
+ *
+ * @param   p_num[out]    Pointer to a buffer to store the generated random number. Must be able to
+ *                        fit the requested random number.
+ *
+ * @param   num_size[in]  Size of the random number to generate.
+ *
+ * @return  kOckamErrorNone on success.
+ ****************************************************************************************************
+ */
+
+OckamError OckamVaultRandom(void *ctx, uint8_t *p_num, size_t num_size);
+
+/*
+ ********************************************************************************************************
+ *                                               DATA TYPES                                             *
+ ********************************************************************************************************
+ */
+
+/**
+ *******************************************************************************
+ * @struct  OckamVaultCtx
+ *
+ * @brief   This struct is common for all Vault implementations. It contains all
+ *          information about a single instance of Vault. Multiple instances of
+ *          vault can be created by allocating multiple Vault context
+ *          structures. The memory, features and ec parameters should always be
+ *          set in this struct. The context pointers may or may not be used, it
+ *          depends on the specific Vault implementation.
+ *******************************************************************************
+ */
+
+typedef struct {
+  const OckamVault *vault;   /*!< Pointer to the Ockam Vault interface             */
+  const OckamMemory *memory; /*!< Pointer to the Ockam Memory interface            */
+  uint32_t features;         /*!< Bitfield containing all enabled vault functions  */
+  uint32_t default_features; /*!< Bitfield containing all enabled default functions*/
+  OckamVaultEc ec;           /*!< The elliptic curve supported by this vault       */
+  void *random_ctx;          /*!< Pointer to random function data                  */
+  void *key_ecdh_ctx;        /*!< Pointer to the Key/ECDH function data            */
+  void *sha256_ctx;          /*!< Pointer to the SHA256 function data              */
+  void *hkdf_ctx;            /*!< Pointer to the HKDF function data                */
+  void *aes_gcm_ctx;         /*!< Pointer to the AES-GCM function data             */
+} OckamVaultCtx;
+
 
 #ifdef __cplusplus
 }

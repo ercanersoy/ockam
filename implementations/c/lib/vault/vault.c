@@ -1,12 +1,9 @@
 /**
  ********************************************************************************************************
- * @file    default.h
- * @brief
+ * @file  vault.c
+ * @brief Wrapper functions for Vault Interface
  ********************************************************************************************************
  */
-
-#ifndef DEFAULT_H_
-#define DEFAULT_H_
 
 /*
  ********************************************************************************************************
@@ -14,7 +11,7 @@
  ********************************************************************************************************
  */
 
-#include "ockam/memory.h"
+#include "ockam/error.h"
 #include "ockam/vault.h"
 
 /*
@@ -22,6 +19,8 @@
  *                                                DEFINES                                               *
  ********************************************************************************************************
  */
+
+#define VAULT_RAND_MAX_SIZE                         32u
 
 /*
  ********************************************************************************************************
@@ -35,62 +34,17 @@
  ********************************************************************************************************
  */
 
-/**
- *******************************************************************************
- * @struct  OckamVaultDefaultConfig
- * @brief
- *******************************************************************************
- */
-
-typedef struct {
-  uint32_t features;
-  OckamVaultEc ec;
-} OckamVaultDefaultConfig;
-
 /*
  ********************************************************************************************************
  *                                          FUNCTION PROTOTYPES                                         *
  ********************************************************************************************************
  */
 
-OckamError OckamVaultDefaultCreate(void **ctx, OckamVaultDefaultConfig *p_cfg, const OckamMemory *memory);
-
-OckamError VaultDefaultDestroy(OckamVaultCtx *ctx);
-
-OckamError VaultDefaultRandom(OckamVaultCtx *ctx, uint8_t *p_num, size_t num_size);
-
-OckamError VaultDefaultKeyGenerate(OckamVaultCtx *ctx, OckamVaultKey key_type);
-
-OckamError VaultDefaultKeyGetPublic(OckamVaultCtx *ctx, OckamVaultKey key_type, uint8_t *p_pub_key,
-                                    size_t pub_key_size);
-
-OckamError VaultDefaultKeySetPrivate(OckamVaultCtx *ctx, OckamVaultKey key_type, uint8_t *p_priv_key,
-                                     size_t priv_key_size);
-
-OckamError VaultDefaultEcdh(OckamVaultCtx *ctx, OckamVaultKey key_type, uint8_t *p_pub_key, size_t pub_key_size,
-                            uint8_t *p_ss, size_t ss_size);
-
-OckamError VaultDefaultSha256(OckamVaultCtx *ctx, uint8_t *p_msg, size_t msg_size, uint8_t *p_digest,
-                              size_t digest_size);
-
-OckamError VaultDefaultHkdf(OckamVaultCtx *ctx, uint8_t *p_salt, size_t salt_size, uint8_t *p_ikm, size_t ikm_size,
-                            uint8_t *p_info, size_t info_size, uint8_t *p_out, size_t out_size);
-
-OckamError VaultDefaultAesGcmEncrypt(OckamVaultCtx *ctx, uint8_t *p_key, size_t key_size, uint8_t *p_iv, size_t iv_size,
-                                     uint8_t *p_aad, size_t aad_size, uint8_t *p_tag, size_t tag_size, uint8_t *p_input,
-                                     size_t input_size, uint8_t *p_output, size_t output_size);
-
-OckamError VaultDefaultAesGcmDecrypt(OckamVaultCtx *ctx, uint8_t *p_key, size_t key_size, uint8_t *p_iv, size_t iv_size,
-                                     uint8_t *p_aad, size_t aad_size, uint8_t *p_tag, size_t tag_size, uint8_t *p_input,
-                                     size_t input_size, uint8_t *p_output, size_t output_size);
-
 /*
  ********************************************************************************************************
  *                                            GLOBAL VARIABLES                                          *
  ********************************************************************************************************
  */
-
-extern const OckamVault ockam_vault_default;
 
 /*
  ********************************************************************************************************
@@ -104,4 +58,48 @@ extern const OckamVault ockam_vault_default;
  ********************************************************************************************************
  */
 
-#endif
+
+/**
+ ****************************************************************************************************
+ *                                          OckamVaultRandom()
+ *
+ * @brief   Generate a random number of desired size.
+ *
+ * @param   p_ctx[in]     Pointer to an initialized Vault context structure.
+ *
+ * @param   p_num[out]    Pointer to a buffer to store the generated random number. Must be able to
+ *                        fit the requested random number.
+ *
+ * @param   num_size[in]  Size of the random number to generate.
+ *
+ * @return  kOckamErrorNone on success.
+ ****************************************************************************************************
+ */
+
+OckamError OckamVaultRandom(void *p_ctx, uint8_t *p_num, size_t num_size)
+{
+  OckamError ret_val = kOckamErrorNone;
+  OckamVaultCtx *p_vault_ctx = 0;
+
+  if (p_ctx == 0) {
+    ret_val = kOckamError;
+    goto exit_block;
+  }
+
+  p_vault_ctx = p_ctx;
+
+  if(p_vault_ctx->vault == 0) {
+    ret_val = kOckamError;
+    goto exit_block;
+  }
+
+  if ((p_num == 0) || (num_size > VAULT_RAND_MAX_SIZE)) {
+    ret_val = kOckamError;
+    goto exit_block;
+  }
+
+  ret_val = p_vault_ctx->vault->Random(p_ctx, p_num, num_size);
+
+exit_block:
+  return ret_val;
+}

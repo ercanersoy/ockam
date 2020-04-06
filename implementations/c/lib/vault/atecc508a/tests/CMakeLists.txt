@@ -12,10 +12,10 @@ ockam_cc_test(
      "test_atecc508a.c"
    INCLUDES
      "${cryptoauthlib-git_SOURCE_DIR}/lib"
-     "${OCKAM_C_ROOT_DIR}/lib/vault/tests"
+     "${OCKAM_C_ROOT_DIR}/lib/vault/tests_suite"
      "${OCKAM_C_ROOT_DIR}/lib/vault/atecc508a"
    DEPS 
-     ockam::vault::tests::suite
+     ockam::vault::tests_suite
      ockam::vault::default
      ockam::vault::atecc508a
      ockam::memory

@@ -12,9 +12,9 @@ ockam_cc_test(
      "test_default.c"
    INCLUDES
      "${OCKAM_C_ROOT_DIR}/lib/vault/default"
-     "${OCKAM_C_ROOT_DIR}/lib/vault/tests"
+     "${OCKAM_C_ROOT_DIR}/lib/vault/tests_suite"
    DEPS 
-     ockam::vault::tests::suite
+     ockam::vault::tests_suite
      ockam::vault::default
      ockam::memory
    PUBLIC )

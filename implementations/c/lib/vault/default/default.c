@@ -101,7 +101,7 @@ VaultError VaultDefaultAesGcm(OckamVaultCtx *p_ctx, int encrypt, uint8_t *p_key,
  */
 
 const OckamVault ockam_vault_default = {
-    (VaultError(*)(void **, void *, const OckamMemory *)) & VaultDefaultCreate,
+    (VaultError(*)(void **, void *, const OckamMemory *)) & OckamVaultDefaultCreate,
 
     (VaultError(*)(void *)) & VaultDefaultDestroy,
 
@@ -135,19 +135,13 @@ const OckamVault ockam_vault_default = {
  ********************************************************************************************************
  */
 
-/*
- ********************************************************************************************************
- *                                            LOCAL FUNCTIONS                                           *
- ********************************************************************************************************
- */
-
 /**
  ********************************************************************************************************
- *                                         VaultDefaultCreate()
+ *                                         OckamVaultDefaultCreate()
  ********************************************************************************************************
  */
 
-VaultError VaultDefaultCreate(OckamVaultCtx **ctx, OckamVaultDefaultConfig *p_cfg, const OckamMemory *memory) {
+VaultError OckamVaultDefaultCreate(void **ctx, OckamVaultDefaultConfig *p_cfg, const OckamMemory *memory) {
   VaultError ret_val = kOckamErrorNone;
   OckamVaultCtx *p_ctx = 0;
   uint8_t delete = 0;
@@ -163,7 +157,7 @@ VaultError VaultDefaultCreate(OckamVaultCtx **ctx, OckamVaultDefaultConfig *p_cf
       goto exit_block;                      /* the context should already exist.                  */
     }
 
-    ret_val = memory->Alloc((void **)ctx, sizeof(OckamVaultCtx));
+    ret_val = memory->Alloc(ctx, sizeof(OckamVaultCtx));
     if (ret_val != kOckamErrorNone) {
       goto exit_block;
     }
@@ -172,6 +166,8 @@ VaultError VaultDefaultCreate(OckamVaultCtx **ctx, OckamVaultDefaultConfig *p_cf
     p_ctx->memory = memory;
     p_ctx->ec = p_cfg->ec;
     p_ctx->default_features = 0;
+    p_ctx->vault = &ockam_vault_default;
+
   } else {
     if (*ctx == 0) {         /* If this is a sub-vault, ensure the context already */
       ret_val = kOckamError; /* exists.                                            */
@@ -227,6 +223,12 @@ exit_block:
 
   return ret_val;
 }
+
+/*
+ ********************************************************************************************************
+ *                                            LOCAL FUNCTIONS                                           *
+ ********************************************************************************************************
+ */
 
 /**
  ********************************************************************************************************

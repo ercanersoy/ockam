@@ -52,3 +52,11 @@ function(set_alwayslink_ockam_libs)
       ${_ALWAYSLINK_LIBS_OCKAM}
   )
 endfunction()
+
+function(set_alwayslink_ockam_includes)
+  install(
+    DIRECTORY ${CMAKE_SOURCE_DIR}/include/ockam/
+    DESTINATION ${OCKAM_INCLUDES_OUTPUT_DIRECTORY}
+    FILES_MATCHING PATTERN "*.h*"
+  )
+endfunction()

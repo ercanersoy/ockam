@@ -250,7 +250,10 @@ TransportError PosixTcpReceiveBlocking(Connection *connection, void *buffer, uin
   p_transmission->buffer_remaining = size;
 
   if(kMoreData != p_transmission->status) {
-    bytes_read = recv(p_tcp->posixSocket.socket, &p_transmission->transmit_length, sizeof(uint16_t), 0);
+    uint16_t recv_len = 0;
+    bytes_read = recv(p_tcp->posixSocket.socket, &recv_len, sizeof(uint16_t), 0);
+    // Must convert from network order to native endianness
+    p_transmission->transmit_length = ntohs(recv_len);
     if(-1 == bytes_read) {
       status = kReceive;
       goto exit_block;
@@ -259,7 +262,7 @@ TransportError PosixTcpReceiveBlocking(Connection *connection, void *buffer, uin
   }
 
   bytes_read = 0;
-  while((kMoreData == p_transmission->status) && (p_transmission->buffer_remaining >0)) {
+  while((kMoreData == p_transmission->status) && (p_transmission->buffer_remaining > 0)) {
     uint16_t bytes_to_read = 0;
     ssize_t recv_status = 0;
     bytes_to_read = p_transmission->transmit_length - p_transmission->bytes_transmitted;
@@ -307,7 +310,9 @@ TransportError PosixTcpSendBlocking(Connection *connection, void *buffer, uint16
     goto exit_block;
   }
 
-  bytes_sent = send(p_tcp->posixSocket.socket, (void*)&length, sizeof(uint16_t), 0);
+  // Convert from native endianness to network order
+  uint16_t send_len = htons(length);
+  bytes_sent = send(p_tcp->posixSocket.socket, (void*)&send_len, sizeof(uint16_t), 0);
   if(sizeof(uint16_t) != bytes_sent) {
     status = kSend;
     goto exit_block;

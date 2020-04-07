@@ -15,3 +15,16 @@ ockam_cc_test(NAME
 		ockam::key_agreement::xx
 		ockam::vault::default
 	)
+
+ockam_cc_test(
+  NAME
+    integration
+  SRCS
+    "xx_test_integration.c"
+  DEPS
+    ockam::transport::posix_socket::tcp
+    ockam::log
+    ockam::memory
+    ockam::key_agreement::xx
+    ockam::vault::default
+)

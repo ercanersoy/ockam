@@ -62,6 +62,7 @@ OckamError OckamErrorXXTestResponderPrologue(KeyEstablishmentXX *xx) {
     log_error(status, "failed to generate get static public key in initiator_step_1");
     goto exit_block;
   }
+  print_uint8_str(xx->e, KEY_SIZE, "Responder epehemral:");
 
   // Nonce to 0, k to empty
   xx->nonce = 0;

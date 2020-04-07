@@ -34,7 +34,7 @@
 #define VECTOR_SIZE 12
 
 #define DEFAULT_IP_ADDRESS "127.0.0.1"
-#define DEFAULT_IP_PORT 8001
+#define DEFAULT_IP_PORT 4000
 
 /*
  ********************************************************************************************************

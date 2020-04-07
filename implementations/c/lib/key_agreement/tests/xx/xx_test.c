@@ -116,6 +116,7 @@ int main(int argc, char *argv[]) {
     goto exit_block;
   }
 
+  printf("Fork\n");
   responder_process = fork();
   if (responder_process < 0) {
     log_error(kTestFailure, "Fork unsuccessful");
@@ -124,12 +125,14 @@ int main(int argc, char *argv[]) {
   }
   if (0 != responder_process) {
     // This is the client process, give the server a moment to come to life
-    sleep(3);
+    printf("in client process\n");
+    sleep(1);
     status = XXTestInitiator(argc, argv, vault, vault_ctx);
     if (0 != status) {
       log_error(kTestFailure, "testTcpClient failed");
       initiator_status = -1;
     }
+    printf("XXTestInitiator finished!\n");
     // Get exit status from responder_process
     wait(&fork_status);
     responder_status = WEXITSTATUS(fork_status);
@@ -139,11 +142,11 @@ int main(int argc, char *argv[]) {
     status = responder_status + initiator_status;
   } else {
     // This is the server process
-    status = XXTestResponder(argc, argv, vault, vault_ctx);
-    if (0 != status) {
-      log_error(kTestFailure, "testTcpServer failed");
-      status = -1;
-    }
+//    status = XXTestResponder(argc, argv, vault, vault_ctx);
+//    if (0 != status) {
+//      log_error(kTestFailure, "testTcpServer failed");
+//      status = -1;
+//    }
   }
 
 exit_block:

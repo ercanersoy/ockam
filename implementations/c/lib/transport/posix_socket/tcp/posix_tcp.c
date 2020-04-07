@@ -106,6 +106,11 @@ TransportError PosixTcpListenBlocking(Connection *listener, OckamInternetAddress
     log_error(status, "failed setsockopt in PosixTcpListenBlocking");
     goto exit_block;
   }
+  if (setsockopt(listen_socket->socket, SOL_SOCKET, SO_KEEPALIVE, &(int){1}, sizeof(int)) < 0) {
+    status = kServerInit;
+    log_error(status, "failed setsockopt in PosixTcpListenBlocking");
+    goto exit_block;
+  }
 
   // Save IP address and port and construct address, if provided
   if (NULL != address) {
@@ -196,6 +201,12 @@ TransportError PosixTcpConnectBlocking(Connection *connection, OckamInternetAddr
     log_error(status, "failed setsockopt in PosixTcpListenBlocking");
     goto exit_block;
   }
+  if (setsockopt(posix_socket->socket, SOL_SOCKET, SO_KEEPALIVE, &(int){1}, sizeof(int)) < 0) {
+    status = kServerInit;
+    log_error(status, "failed setsockopt in PosixTcpListenBlocking");
+    goto exit_block;
+  }
+
 
   // Try to connect
   if (connect(posix_socket->socket, (struct sockaddr *)&posix_socket->socketAddress,

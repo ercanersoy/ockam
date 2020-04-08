@@ -21,14 +21,14 @@ int main(void)
   /* Before we initialize a vault, we need to first initialize a memory
    * allocator, in this example we're using an allocator based on stdlib
    * malloc/free. */
-  ockam_memory_t memory = 0;
+  ockam_memory_t memory;
   error = ockam_memory_stdlib_initialize(&memory);
   if (error != OCKAM_ERROR_NONE) {
     goto exit;
   }
 
   /* Initialize the default software vault implementation. */
-  ockam_vault_t vault = 0;
+  ockam_vault_t vault;
   ockam_vault_default_options_t vault_options = {.memory = memory};
   error = ockam_vault_default_initialize(&vault, &vault_options);
   if (error != OCKAM_ERROR_NONE) {

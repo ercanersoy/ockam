@@ -21,18 +21,18 @@ int main(void)
   /* Before we initialize a vault, we need to first initialize a memory
    * allocator, in this example we're using an allocator based on stdlib
    * malloc/free. */
-  ockam_memory_t memory = 0;
+  ockam_memory_t memory;
   error = ockam_memory_stdlib_initialize(&memory);
   if (error != OCKAM_ERROR_NONE) {
-      goto exit;
+    goto exit;
   }
 
   /* Initialize the default software vault implementation. */
-  ockam_vault_t vault = 0;
+  ockam_vault_t vault;
   ockam_vault_default_options_t vault_options = {.memory = memory};
   error = ockam_vault_default_initialize(&vault, &vault_options);
   if (error != OCKAM_ERROR_NONE) {
-      goto exit;
+    goto exit;
   }
 
   /* Calculate the sha256 hash of a fixed input */
@@ -40,7 +40,7 @@ int main(void)
   uint8_t output[OCKAM_VAULT_SHA256_OUTPUT_SIZE] = {0};
   error = ockam_vault_sha256(vault, input, sizeof(input), &output[0]);
   if (error != OCKAM_ERROR_NONE) {
-      goto exit;
+    goto exit;
   }
 
   /* Print the generated sha256 output. */
@@ -48,7 +48,7 @@ int main(void)
 
 exit:
   if (error != OCKAM_ERROR_NONE) {
-      exit_code = -1;
+    exit_code = -1;
   }
 
   ockam_vault_cleanup(vault);

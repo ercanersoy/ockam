@@ -2,6 +2,11 @@ defmodule Ockam.Integration.Handshake.Test do
   use ExUnit.Case, async: false
   require Logger
 
+  alias Ockam.Channel
+  alias Ockam.Transport.Address
+  alias Ockam.Transport.Socket
+  alias Ockam.Vault.KeyPair
+
   setup context do
     if transport = context[:transport] do
       name = Map.fetch!(context, :transport_name)
@@ -28,5 +33,23 @@ defmodule Ockam.Integration.Handshake.Test do
     end
 
     assert status == 0
+  end
+
+
+  @tag listen_port: 4000
+  test "with C implementation as responder", %{listen_port: port} do
+    {:ok, addr} = Address.new(:inet, :loopback, port)
+    socket = Socket.new(:client, addr)
+
+    s = KeyPair.new(:x25519)
+    e = KeyPair.new(:x25519)
+    rs = KeyPair.new(:x25519)
+    re = KeyPair.new(:x25519)
+
+    handshake_opts = %{protocol: "Noise_XX_25519_AESGCM_SHA256", s: s, e: e, rs: rs, re: re}
+    assert {:ok, handshake} = Channel.handshake(:initiator, handshake_opts)
+    assert {:ok, transport} = Socket.open(socket)
+    assert {:ok, _chan, transport} = Channel.negotiate_secure_channel(handshake, transport)
+    assert {:ok, _} = Socket.close(transport)
   end
 end

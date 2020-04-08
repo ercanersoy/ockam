@@ -1,8 +1,8 @@
 
 #include "ockam/error.h"
 
-#include "ockam/memory_allocator.h"
-#include "ockam/memory_allocator/stdlib.h"
+#include "ockam/memory.h"
+#include "ockam/memory/stdlib.h"
 
 #include "ockam/vault.h"
 #include "ockam/vault/default.h"
@@ -20,15 +20,15 @@ int main(void) {
   /* Before we initialize a vault, we need to first initialize a memory
    * allocator, in this example we're using an allocator based on stdlib
    * malloc/free. */
-  ockam_memory_allocator_t* memory_allocator = 0;
-  error = ockam_memory_allocator_stdlib_initialize(&memory_allocator);
+  ockam_memory_t* memory = 0;
+  error = ockam_memory_stdlib_initialize(&memory);
   if (error != OCKAM_ERROR_NONE) {
     goto exit;
   }
 
   /* Initialize the default software vault implementation. */
   ockam_vault_t* vault = 0;
-  ockam_vault_default_options_t vault_options = {.memory_allocator = memory_allocator};
+  ockam_vault_default_options_t vault_options = {.memory = memory};
   error = ockam_vault_default_initialize(&vault, &vault_options);
   if (error != OCKAM_ERROR_NONE) {
     goto exit;
@@ -50,7 +50,7 @@ exit:
   }
 
   ockam_vault_cleanup(vault);
-  ockam_memory_allocator_cleanup(memory_allocator);
+  ockam_memory_cleanup(memory);
 
   return exit_code;
 }

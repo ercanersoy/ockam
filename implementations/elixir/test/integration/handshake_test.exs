@@ -24,20 +24,16 @@ defmodule Ockam.Integration.Handshake.Test do
   @tag transport_config: [listen_address: "0.0.0.0", listen_port: 4000]
   @tag capture_log: false
   test "with C implementation as initiator", %{config: _config} do
-    init_dir = Path.expand(Path.join([__DIR__, "..", "..", "..", "c", "_build"]))
-    init_cmd = Path.join([init_dir, "Debug", "tests", "ockam_key_agreement_tests_xx_integration"])
-    {output, status} = System.cmd(init_cmd, [], cd: init_dir, stderr_to_stdout: true)
-
-    if status != 0 do
-      Logger.warn("Captured Output:\n" <> output)
-    end
-
-    assert status == 0
+    assert {:ok, _} = invoke_test_executable!()
   end
 
 
+  @tag initiator: true
   @tag listen_port: 4000
   test "with C implementation as responder", %{listen_port: port} do
+    # TODO: Start server first
+    # assert {:ok, _} = invoke_test_executable!([...])
+
     {:ok, addr} = Address.new(:inet, :loopback, port)
     socket = Socket.new(:client, addr)
 
@@ -51,5 +47,18 @@ defmodule Ockam.Integration.Handshake.Test do
     assert {:ok, transport} = Socket.open(socket)
     assert {:ok, _chan, transport} = Channel.negotiate_secure_channel(handshake, transport)
     assert {:ok, _} = Socket.close(transport)
+  end
+
+  defp invoke_test_executable!(args \\ []) when is_list(args) do
+    init_dir = Path.expand(Path.join([__DIR__, "..", "..", "..", "c", "_build"]))
+    init_cmd = Path.join([init_dir, "Debug", "tests", "ockam_key_agreement_tests_xx_integration"])
+    {output, status} = System.cmd(init_cmd, args, cd: init_dir, stderr_to_stdout: true)
+
+    if status != 0 do
+      Logger.warn("Captured Output:\n" <> output)
+      {:error, status}
+    else
+      {:ok, output}
+    end
   end
 end
